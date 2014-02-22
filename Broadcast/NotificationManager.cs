@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Broadcast
@@ -40,6 +41,15 @@ namespace Broadcast
             }
         }
 
+        public static void UnRegisterObserver(object observer, string notification)
+        {
+            if (_Observers.ContainsKey(notification))
+            {
+                var registeredObserver = _Observers[notification].Where(obs => obs.Observer == observer).FirstOrDefault();
+                _Observers[notification].Remove(registeredObserver);
+            }
+        }
+
         /// <summary>
         /// Posts a notification to the manager for broadcasting to other objects.
         /// When a notification is posted, all objects that observe that notification will be notified via the method delegates they provided when registering.
@@ -47,7 +57,7 @@ namespace Broadcast
         /// <param name="sender">The sender whom posted the notification.</param>
         /// <param name="notification">The notification being posted.</param>
         /// <param name="userData">Custom data provided by the sender that can be used by all of the observing objects.</param>
-        public static void PostNotification(object sender, string notification, Dictionary<string, object> userData)
+        public static void PostNotification(object sender, string notification, Dictionary<string, object> userData = null)
         {
             // Make sure the notification exists.
             if (_Observers.ContainsKey(notification))
