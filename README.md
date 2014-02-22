@@ -14,6 +14,7 @@ Registering for notifications
 To register for your object to receive notifications, you create a method that you want to have the manager target when a notification happens, then just invoke the RegisterObserver static method.
 
 ```
+// Constructor for MyObject
 public MyObject()
 {
     NotificationManager.RegisterObserver(this, "MyNotification", MyMethod);
