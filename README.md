@@ -89,3 +89,12 @@ class Program
     }
 }
 ```
+
+Notifications with Async
+========================
+
+In the event that you know that you are going to have a lot of objects registered to a specific notification, you can broadcast the notification asynchronously.
+
+```
+NotificationManager.PostNotificationAsync(this, "LargeNotification");
+```
