@@ -39,3 +39,52 @@ public void SomeMethod()
 ```
 
 Once the notification is posted, the MyMethod method above will immediately be called. The PostNotification method will broadcast synchronously to all of the observers. You can invoke the PostNotificationAsync method if you want the manager to broadcast to all observers asynchronously.
+
+Posting notifications with parameters
+=====================================
+
+If you need to provide a set of parameters with your notification post, you can do so with a dictionary. The registered object will receive them in their method delegate userData dictionary.
+
+```
+class Person
+{
+    string Name {get;set;}
+    Person SignificantOther {get;set;}
+    List<Person> Children {get;set;}
+    
+    Person()
+    {
+        // Register for the notification.
+        NotificationManager.RegisterObserver(this, "ChildBorn", AddChild);
+    }
+    
+    // Receives the notification.
+    void AddChild(object sender, Dictionary<string, object> userData)
+    {
+        var child = new Person();
+        
+        if (userData.ContainsKey("Name"))
+            child.Name = userData["Name"] as string;
+            
+        this.Children.Add(child);
+        
+        if (this.SignificantOther == null && sender is Person)
+            this.SignificantOther = sender as Person; // Assumed to be the mom of child; therefore significant other.
+    }
+}
+
+class Program
+{
+    void Main()
+    {
+        var mother = new Person();
+        mother.Name = "Alice";
+        
+        var childName = new Dictionary<string, object>();
+        childName.Add("Name", "Joey");
+        
+        // Post the notification.
+        NotificationManager.PostNotification(mother, childName);
+    }
+}
+```
