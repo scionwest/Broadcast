@@ -4,7 +4,7 @@ Broadcast
 Broadcast provides a simple alternative for object communication within .NET applications using a observer pattern.
 
 Why Broadcast over IObservable?
-===============================
+------------------------------
 
 With Broadcast, a single object can communicate with multiple objects, without knowing that the objects exist. The  implementations within .NET such as the IObserver and IObservable pattern are mostly used with Properties. They do not provide a solid mechinism for broadcasting messages or manipulating objects during a method invocation or in the middle of an asynchronous task.
 
