@@ -41,6 +41,12 @@ namespace Broadcast
             }
         }
 
+        /// <summary>
+        /// Unregisters a single observer for the supplied notification.
+        /// Since an object can be registered for multiple notifications, you must supply the notification you wish to unregister from.
+        /// </summary>
+        /// <param name="observer">The object that no longer wants to receive the supplied notification.</param>
+        /// <param name="notification">The notification associated with the supplied object.</param>
         public static void UnregisterObserver(object observer, string notification)
         {
             if (_Observers.ContainsKey(notification))
@@ -50,6 +56,11 @@ namespace Broadcast
             }
         }
 
+        /// <summary>
+        /// Unregisters all observers from posted notifications. 
+        /// An optional notification parameter allows for unregistering all objects associated with the supplied notification only.
+        /// </summary>
+        /// <param name="notification">All observers registered for this notification will become unregistered. All other observed notifications are no affected.</param>
         public static void UnregisterAllObservers(string notification = null)
         {
             if (string.IsNullOrWhiteSpace(notification))
