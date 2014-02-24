@@ -26,6 +26,8 @@ void MyMethod(object sender, Dictionary<string, object> userData)
 }
 ```
 
+Note that there are no "BeganObserving" notifications sent to any objects once registration takes place. Objects must be self aware that they have registered
+
 Posting notifications
 ---------------------
 
@@ -121,14 +123,14 @@ public class MyObject
 
 With the above example, every time you Post a LogInformation or LogError notification, your 3rd party log class will execute the appropriate methods.
 
-If you want to unregister from the notification manager, you must pass Log as the sender and not "this".
+Note that if you want to unregister from the notification manager, you must pass Log as the sender.
 
 Using this technique, you can abstract your application away from relying on a 3rd party framework in a very tightly bound manor. Using this abstracted approach will let you swap out the logger class with a custom one in the future without having to change "Log.WriteInformation" all over in your source. You just need to change it in one location, the property declaration and the registration to NotificationManager.
 
 Unregistering a single object from notifications
 ------------------------------------------------
 
-Unregistering a single observer from notifications is simple. You just invoke the UnRegisterObserver method.
+Unregistering a single observer from notifications is simple. You just invoke the UnregisterObserver method.
 
 ```
 NotificationManager.UnregisterObserver(this, "MyNotification");
@@ -151,3 +153,5 @@ In order to unregister every observer that has previously registered to receive 
 ```
 NotificationManager.UnregisterAllObservers();
 ```
+
+Note that there is no notification provided to observers that they are being unregistered. 
