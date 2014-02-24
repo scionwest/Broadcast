@@ -125,3 +125,29 @@ In the event that you know that you are going to have a lot of objects registere
 ```
 NotificationManager.PostNotificationAsync(this, "LargeNotification");
 ```
+
+Registering children objects
+----------------------------
+
+What if you downloaded a 3rd party framework and wanted to use Broadcast on a object contained within it? For instance, the framework might include a logger class that you want to have register with NotificationManager. Since you do not have the source code, you can not register it. How do you get around this?
+
+Thanks to how Action objects are handled in .NET, you can easily add Broadcast support to any class, even if you do not have the source code. Simple pass the object as the sender when you register and then provide a method within the object you want to use as the Action.
+
+```
+public class MyObject
+{
+    public ExternalLogger Log {get;set;}
+    
+    public MyObject()
+    {
+        NotificationManager.RegisterObserver(Log, "LogInformation", Log.WriteInformation);
+        NotificationManager.RegisterObserver(Log, "LogError", Log.WriteError);
+    }
+}
+```
+
+With the above example, every time you Post a LogInformation or LogError notification, your 3rd party log class will execute the appropriate methods.
+
+If you want to unregister from the notification manager, you must pass Log as the sender and not "this".
+
+Using this technique, you can abstract your application away from relying on a 3rd party framework in a very tightly bound manor. Using this abstracted approach will let you swap out the logger class with a custom one in the future without having to change "Log.WriteInformation" all over in your source. You just need to change it in one location, the property declaration and the registration to NotificationManager.
