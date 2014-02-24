@@ -40,12 +40,31 @@ public void SomeMethod()
 
 Once the notification is posted, the MyMethod method above will immediately be called. The PostNotification method will broadcast synchronously to all of the observers. You can invoke the PostNotificationAsync method if you want the manager to broadcast to all observers asynchronously.
 
-Unregistering from notifications
+Unregistering a single object from notifications
 ================================
 
-Unregistering a observer from notifications is simple. You just invoke the UnRegisterObserver method.
+Unregistering a single observer from notifications is simple. You just invoke the UnRegisterObserver method.
+
 ```
-NotificationManager.UnRegisterObserver(this, "MyNotification");
+NotificationManager.UnregisterObserver(this, "MyNotification");
+```
+
+Unregistering all objects associated with a specific notification
+=================================================================
+
+Unregistering all observers that share the same notification is just as simple as removing a single object.
+
+```
+NotificationManager.UnregisterAllObservers("MyNotification");
+```
+
+Unregistering all observers and all notifications.
+==================================================
+
+In order to unregister every observer that has previously registered to receive notifications uses the UnregisterAllObservers method. You can use this to clear out all notification registerations in one shot.
+
+```
+NotificationManager.UnregisterAllObservers();
 ```
 
 Posting notifications with parameters
