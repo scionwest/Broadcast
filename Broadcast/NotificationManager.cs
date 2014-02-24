@@ -41,12 +41,25 @@ namespace Broadcast
             }
         }
 
-        public static void UnRegisterObserver(object observer, string notification)
+        public static void UnregisterObserver(object observer, string notification)
         {
             if (_Observers.ContainsKey(notification))
             {
                 var registeredObserver = _Observers[notification].Where(obs => obs.Observer == observer).FirstOrDefault();
                 _Observers[notification].Remove(registeredObserver);
+            }
+        }
+
+        public static void UnregisterAllObservers(string notification = null)
+        {
+            if (string.IsNullOrWhiteSpace(notification))
+                _Observers.Clear();
+            else
+            {
+                if (_Observers.ContainsKey(notification))
+                {
+                    _Observers.Remove(notification);
+                }
             }
         }
 
