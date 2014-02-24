@@ -6,7 +6,7 @@ Broadcast provides a simple alternative for object communication within .NET app
 Why Broadcast over IObservable?
 ------------------------------
 
-With Broadcast, a single object can communicate with multiple objects, without knowing that the objects exist. The  implementations within .NET such as the IObserver and IObservable pattern are mostly used with Properties. They do not provide a solid mechinism for broadcasting messages or manipulating objects during a method invocation or in the middle of an asynchronous task.
+With Broadcast, a single object can communicate with multiple objects, without knowing that the objects exist. The  implementations within .NET such as the IObserver and IObservable pattern are mostly used with Properties. They do not provide a solid mechinism for broadcasting messages or manipulating objects during a method invocation or in the middle of an asynchronous task. The .NET implementation uses Generics, so you must create a observer repository for each Type you wish to Observe. With Broadcast's NotificationManager, you can mix and match registered Types with the manager. This allows you to focus on handling notifications rather than writing custom observer patterns for every Observable Type in your project.
 
 Registering for notifications
 -----------------------------
