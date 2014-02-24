@@ -3,10 +3,14 @@ Broadcast
 
 Broadcast provides a simple alternative for object communication within .NET applications using a observer pattern.
 
-Why Broadcast over IObservable?
+Why Broadcast over .NET's IObserver?
 ------------------------------
 
-With Broadcast, a single object can communicate with multiple objects, without knowing that the objects exist. The  implementations within .NET such as the IObserver and IObservable pattern are mostly used with Properties. They do not provide a solid mechinism for broadcasting messages or manipulating objects during a method invocation or in the middle of an asynchronous task. The .NET implementation uses Generics, so you must create a observer repository for each Type you wish to Observe. With Broadcast's NotificationManager, you can mix and match registered Types with the manager. This allows you to focus on handling notifications rather than writing custom observer patterns for every Observable Type in your project.
+With Broadcast, a single object can communicate with multiple objects, without knowing that the objects exist. The  implementations within .NET such as the IObserver and IObservable pattern are mostly used with Properties. They do not provide a solid mechinism for broadcasting messages or manipulating objects during a method invocation or in the middle of an asynchronous task. 
+
+The .NET implementation uses Generics, so you must create a Observable repository for each Type you wish to Observe. With Broadcast's NotificationManager, you can mix and match registered Types with the manager. This allows you to focus on handling notifications rather than writing custom observer objects for every Observable Type in your project.
+
+The .NET implementation requires all Type's that want to subscribe to the Observer and react to notifications, to implement a lot more code. They require you to strongly type your observer to the same Type that your Observable is Typed to. So each class can only observe one object. On top of that, you can not have any class pass a non-observer Type to the Observer. Broadcast can as demonstrated below under the Registering Children Observers.
 
 Registering for notifications
 -----------------------------
