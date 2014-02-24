@@ -9,7 +9,7 @@ Why Broadcast over IObservable?
 With Broadcast, a single object can communicate with multiple objects, without knowing that the objects exist. The  implementations within .NET such as the IObserver and IObservable pattern are mostly used with Properties. They do not provide a solid mechinism for broadcasting messages or manipulating objects during a method invocation or in the middle of an asynchronous task.
 
 Registering for notifications
-=============================
+-----------------------------
 
 To register for your object to receive notifications, you create a method that you want to have the manager target when a notification happens, then just invoke the RegisterObserver static method.
 
@@ -27,7 +27,7 @@ void MyMethod(object sender, Dictionary<string, object> userData)
 ```
 
 Posting notifications
-=====================
+---------------------
 
 To post a notification, that the manager will broadcast to all of the observing objects, you invoke the PostNotification method.
 
@@ -41,7 +41,7 @@ public void SomeMethod()
 Once the notification is posted, the MyMethod method above will immediately be called. The PostNotification method will broadcast synchronously to all of the observers. You can invoke the PostNotificationAsync method if you want the manager to broadcast to all observers asynchronously.
 
 Unregistering a single object from notifications
-================================
+------------------------------------------------
 
 Unregistering a single observer from notifications is simple. You just invoke the UnRegisterObserver method.
 
@@ -50,7 +50,7 @@ NotificationManager.UnregisterObserver(this, "MyNotification");
 ```
 
 Unregistering all objects associated with a specific notification
-=================================================================
+-----------------------------------------------------------------
 
 Unregistering all observers that share the same notification is just as simple as removing a single object.
 
@@ -59,7 +59,7 @@ NotificationManager.UnregisterAllObservers("MyNotification");
 ```
 
 Unregistering all observers and all notifications.
-==================================================
+--------------------------------------------------
 
 In order to unregister every observer that has previously registered to receive notifications uses the UnregisterAllObservers method. You can use this to clear out all notification registerations in one shot.
 
@@ -68,7 +68,7 @@ NotificationManager.UnregisterAllObservers();
 ```
 
 Posting notifications with parameters
-=====================================
+-------------------------------------
 
 If you need to provide a set of parameters with your notification post, you can do so with a dictionary. The registered object will receive them in their method delegate userData dictionary.
 
@@ -118,7 +118,7 @@ class Program
 ```
 
 Notifications with Async
-========================
+------------------------
 
 In the event that you know that you are going to have a lot of objects registered to a specific notification, you can broadcast the notification asynchronously.
 
