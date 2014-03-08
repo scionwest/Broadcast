@@ -11,13 +11,14 @@ namespace DemoApp
     {
         static void Main(string[] args)
         {
-            Inspector inspector1 = new Inspector("Bob");
-            Inspector inspector2 = new Inspector("Jan");
+            var headquarters = new Headquarter();
 
-            NotificationManager.RegisterObserver(inspector1, "MessageSent", inspector1.ReceiveMessage);
-            NotificationManager.RegisterObserver(inspector2, "MessageSent", inspector2.ReceiveMessage);
+            var bob = new Inspector { Name = "Bob" };
+            var jim = new Inspector { Name = "Jim" };
 
-            NotificationManager.PostNotification("Program broadcasted to both Inspector's from one Notification Post!", "MessageSent");
+            bob.Speak("Hello there!");
+            jim.Speak("I'm another inspector!");
+
             Console.ReadKey();
         }
     }

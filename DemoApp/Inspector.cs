@@ -9,17 +9,11 @@ namespace DemoApp
 {
     public class Inspector
     {
-        private string instName;
+        public string Name { get; set; }
 
-        public Inspector(string name)
+        public void Speak(string message)
         {
-            instName = name;
-        }
-
-        public void ReceiveMessage(object sender, Dictionary<string, object> userData)
-        {
-            if (sender is string)
-                Console.WriteLine(instName + " received the following message:" + sender as string);
+            NotificationManager.PostNotification(this, "InspectorNotification", new Dictionary<string, object> { { "Message", message } });
         }
     }
 }
