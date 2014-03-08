@@ -1,6 +1,9 @@
 Broadcast
 =========
 
+_Current Version: 1.1_
+
+
 Broadcast provides a simple alternative for object communication within .NET applications using a observer pattern.
 
 Why Broadcast over .NET's IObserver?
