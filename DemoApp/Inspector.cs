@@ -14,7 +14,6 @@ namespace DemoApp
         public Inspector(string name)
         {
             instName = name;
-            NotificationManager.RegisterObserver(this, "MessageSent", ReceiveMessage);
         }
 
         public void ReceiveMessage(object sender, Dictionary<string, object> userData)
