@@ -8,6 +8,8 @@ namespace Broadcast
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The message broker for all messaging
@@ -70,6 +72,28 @@ namespace Broadcast
         /// <param name="message">The message.</param>
         public void Publish<T>(T message) where T : class, IMessage
         {
+            foreach (INotification<T> handler in this.GetSubscribersForMessage(message))
+            {
+                handler.ProcessMessage(message);
+            }
+        }
+
+        /// <summary>
+        /// Publishes the specified message asynchronously to all subscribers
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message">The message.</param>
+        /// <returns>Returns an awaitable Task</returns>
+        public async Task PublishAsync<T>(T message) where T : class, IMessage
+        {
+            foreach (INotification<T> handler in this.GetSubscribersForMessage(message))
+            {
+                await Task.Run(() => handler.ProcessMessage(message));
+            }
+        }
+
+        private IEnumerable<ISubscription> GetSubscribersForMessage<T>(T message) where T : class, IMessage
+        {
             if (message == null)
             {
                 throw new ArgumentNullException(nameof(message), "You can not publish a null message.");
@@ -77,16 +101,12 @@ namespace Broadcast
 
             if (!_listeners.ContainsKey(typeof(T)))
             {
-                return;
+                return Enumerable.Empty<ISubscription>();
             }
 
             // Create a local reference of the collection to protect us against the collection
             // adding a new subscriber while we're enumerating
-            var listenersToPublishTo = _listeners[typeof(T)].ToArray();
-            foreach (INotification<T> handler in listenersToPublishTo)
-            {
-                handler.ProcessMessage(message);
-            }
+            return _listeners[typeof(T)].ToArray();
         }
 
         /// <summary>

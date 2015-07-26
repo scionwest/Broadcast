@@ -6,6 +6,7 @@
 namespace Broadcast
 {
     using System;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides a contract for Mediators to use when handling notifications between objects.
@@ -27,5 +28,12 @@ namespace Broadcast
         /// <typeparam name="TMessageType"></typeparam>
         /// <param name="message">The message.</param>
         void Publish<TMessageType>(TMessageType message) where TMessageType : class, IMessage;
+
+        /// <summary>
+        /// Publishes the specified message asynchronously to all subscribers.
+        /// </summary>
+        /// <typeparam name="TMessageType"></typeparam>
+        /// <param name="message">The message.</param>
+        Task PublishAsync<TMessageType>(TMessageType message) where TMessageType : class, IMessage;
     }
 }
