@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests.Fixtures;
-using ExceptionFactory;
 
 namespace Broadcast.Tests
 {
@@ -105,7 +104,7 @@ namespace Broadcast.Tests
 
             // Act
             notificationCenter.Publish(new BroadcastMessage<string>("Test"));
-            //notificationCenter.Publish(new SecondaryMessageFixture(new DefaultPlayer(null, notificationCenter)));
+            notificationCenter.Publish(new BroadcastMessage<SimpleContent>(new SimpleContent()));
         }
     }
 }
