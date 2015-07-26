@@ -1,10 +1,10 @@
-Broadcast
+Broadcast Notifications
 =========
 
-_Current Version: 1.1_
+_Current Version: 2.0_
 
 
-Broadcast provides a simple alternative for object communication within .NET applications using a observer pattern.
+Broadcast Notifications provides a simple alternative for object communication within .NET applications using a PubSub pattern.
 
 Why Broadcast over .NET's IObserver?
 ------------------------------
@@ -26,16 +26,30 @@ To register for your object to receive notifications, you create a method that y
 // Constructor for MyObject
 public MyObject()
 {
-    NotificationManager.RegisterObserver(this, "MyNotification", MyMethod);
-}
-
-void MyMethod(object sender, Dictionary<string, object> userData)
-{
-    // Do stuff....
+    notificationCenter.Subscribe<BroadcastMessage<string>>(
+        (message, sub) =>
+        {
+            Console.WriteLine(message.Content);
+        });
 }
 ```
 
-Note that there are no "BeganObserving" notifications sent to any objects once registration takes place. Objects must be self aware that they have registered
+You can also subscribe with a conditional lambda that must pass in order for the subscriber to receive messages.
+
+```
+// Constructor for MyObject
+public MyObject()
+{
+    notificationCenter.Subscribe<BroadcastMessage<string>>(
+        (message, sub) =>
+        {
+            Console.WriteLine(message.Content);
+        },
+        (message) => message.Content.Equals("Opening"));
+}
+```
+
+In the above example, the `Console.WriteLine` method will only be invoked if the content of the message is equal to `Opening`.
 
 Posting notifications
 ---------------------
@@ -45,128 +59,36 @@ To post a notification, that the manager will broadcast to all of the observing 
 ```
 public void SomeMethod()
 {
-    NotificationManager.PostNotification(this, "MyNotification");
+    notificationCenter.Publish(new BroadcastMessage<string>("Test"));
 }
 ```
 
-Once the notification is posted, the MyMethod method above will immediately be called. The PostNotification method will broadcast synchronously to all of the observers. You can invoke the PostNotificationAsync method if you want the manager to broadcast to all observers asynchronously.
+Once the notification is posted, the subscription callback above will immediately be called. The PostNotification method will broadcast synchronously to all of the observers. You can invoke the PostNotificationAsync method if you want the manager to broadcast to all observers asynchronously.
 
-You should always post a notification with the object who is responsible for the notification being passed as the sender. In most cases, it should always be `this`. It is bad practice to pass data in as sender for the observers to access and parse. Instead, you should use the user data parameter option below.
+Unsubscribing
+-------------
 
-Notifications with Async
-------------------------
+The `INotificationCenter.Subscribe` method returns an instance of `ISubscription` which can be used to unsubscribe from publications. You can either unsubscribe via the returned `ISubscription` instance, or you can unsubscribe using the provided `ISubscription` instance in the subscription callback.
 
-In the event that you know that you are going to have a lot of objects registered to a specific notification, you can broadcast the notification asynchronously.
+    // Subscribe our notification and publish a new message
+    notificationCenter.Publish(new BroadcastMessage<SimpleContent>(new SimpleContent()));
 
-```
-NotificationManager.PostNotificationAsync(this, "LargeNotification");
-```
-
-Posting notifications with parameters
--------------------------------------
-
-If you need to provide a set of parameters with your notification post, you can do so with a dictionary. The registered object will receive them in their method delegate userData dictionary.
-
-```
-
-class Program
-{
-    void Main()
-    {
-        var userData = new Dictionary<string, object>
+    ISubscription subscriber = notificationCenter.Subscribe<BroadcastMessage<SimpleContent>>(
+        (message, sub) => 
         {
-            { "SomeKey", "Arbitrary data can be supplied" }
-        };
-        
-        // Post the notification.
-        NotificationManager.PostNotification(this, "SomeNotification, userData);
-    }
-}
-```
+            // Unsubscribe from within the callback based on the result.
+            if (message.Content == "Closed")
+                sub.Unsubscribe();
+        });
 
-Registering children objects
-----------------------------
-
-What if you downloaded a 3rd party framework and wanted to use Broadcast on a object contained within it? For instance, the framework might include a logger class that you want to have register with NotificationManager. Since you do not have the source code, you can not register it. How do you get around this?
-
-Thanks to anonymous, you can easily add Broadcast support to any class, even if you do not have the source code. Simply pass the object as the sender when you register and then provide a method within the object you want to use as the Action and wrap that method within an anonymous method that satisfies the required method signature. In the example below, the Log.WriteInformation method does not contain two arguments that matches the required method delegate signature for registering a observer. So we create an anonymous method that contains two arguments that match the signature and place the WriteInformation method invocation within it.
-
-```
-public class MyObject
-{
-    public ExternalLogger Log {get;set;}
+    // Unsubscribe the notification and attempt a new publish
+    subscriber.Unsubscribe();
     
-    public MyObject()
-    {
-        NotificationManager.RegisterObserver(Log, "LogInformation", (x, y) => Log.WriteInformation());
-        NotificationManager.RegisterObserver(Log, "LogError", (x, y) => Log.WriteError());
-    }
-}
-```
+Message Content
+---------------
 
-With the above example, every time you Post a LogInformation or LogError notification, your 3rd party log class will execute the appropriate methods.
+You may send in any class that implements the `IMessage<T>` interface as a publication. The API includes a `BroadcastMessage<T>` class that can be used to wrap simple messages, like a string, or a class.
 
-Note that if you want to unregister from the notification manager, you must pass Log as the sender.
-
-Using this technique, you can abstract your application away from relying on a 3rd party framework in a very tightly bound manor. Using this abstracted approach will let you swap out the logger class with a custom one in the future without having to change "Log.WriteInformation" all over in your source. You just need to change it in one location, the property declaration and the registration to NotificationManager.
-
-Unregistering a single object from notifications
-------------------------------------------------
-
-Unregistering a single observer from notifications is simple. You just invoke the UnregisterObserver method.
-
-```
-NotificationManager.UnregisterObserver(this, "MyNotification");
-```
-
-There might be times where manually unregistering an observer is needed.
-
-Unregistering all objects associated with a specific notification
------------------------------------------------------------------
-
-Unregistering all observers that share the same notification is just as simple as removing a single object.
-
-```
-NotificationManager.UnregisterAllObservers("MyNotification");
-```
-
-Unregistering all observers and all notifications.
---------------------------------------------------
-
-In order to unregister every observer that has previously registered to receive notifications uses the UnregisterAllObservers method. You can use this to clear out all notification registerations in one shot.
-
-```
-NotificationManager.UnregisterAllObservers();
-```
-
-Note that there is no notification provided to observers that they are being unregistered. 
-
-Unregistering null objects
---------------------------
-
-The NotificationManager is self cleaning. Meaning that as objects become null, it will handle unregistering them on its own. You don't have to worry about notifications trying to post to null objects, as all null objects are purged from its internal collection after each Post is performed.
-
-Posting to the Main UI Thread
------------------------------
-
-While you are working with UI controls, you can only access them while on the main thread. It is possible that another object has posted a notification from a different thread and your UI controls receive the notification and react to it. What happens then is that any attempt to access a UI control will throw an exception. 
-
-In order to work around this, I provided the ability to attach a SynchronizationContext to the manager. This provides the manager with asynchronous support and not require the UI code-behind classes to perform a ton of main thread checks. You grab the main thread `SynchronizationContext` from within your MainWindow (WPF) or any Form (WinForms) constructor and assign it to the `NotificationManager.Context`property.
-
-```
-    NotificationManager.Context = System.Threading.SynchronizationContext.Current;
-```
-
-By setting the `Context` property, the NotificationManager will post all Synchronous broadcasts to that thread. If that property is null, the NotificationManager will post all broadcasts to the calling thread. Note that it is possible to perform a synchronous broadcast from another thread other than the main. The caller might be running asynchronous, even though a synchronous post was invoked. That is why assigning the SynchronizationContext is important. It ensures that synchronous posts are guaranteed to be ran on the main thread.
-
-Forcing a Synchronous broadcast from an asynchronous post
--------------------------------------------------------
-
-If an asynchronous post is broadcasted, but you want to force an object to handle the broadcast in a synchronous fashion (such as a UI element), then simply providing the `Context` is not enough. Setting the `Context` ensures that synchronous posts are ran on the main thread, but do not guarantee that an async post will run on the main thread. 
-
-In order to force an object to run on the main thread, even if an async post was broadcasted, you can register the observer with an overloaded registration method. A 3rd parameter (boolean) can be used to inform the NotificationManager that this particular observer can never run async and must always run synchronous. If the `Context` is not null then it forces this observer to run on the main thread.
-
-```
-    NotificationManager.RegisterObserver(this, "SomeNotification", this.HandleNotification, canRunAsync: false);
-
-```
+    notificationCenter.Publish(new BroadcastMessage<SimpleContent>(new SimpleContent("Content Generated")));
+    
+You may opt in to creating as many classes as you want that implement `IMessage<T>`, allowing for your messages to contain complex logic.
